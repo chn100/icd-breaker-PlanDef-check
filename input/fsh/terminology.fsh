@@ -159,3 +159,4 @@ Description: "Terminology used for representation of the information on pharmace
 * $NCIT#C42897 "TABLET, COATED"
 * $NCIT#C42898 "SOLUTION, CONCENTRATE"
 * $NCIT#C42899 "INJECTION, SOLUTION, CONCENTRATE"
+
