@@ -2,18 +2,16 @@ Alias: $NCIT = http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl
 
 Extension: ContainerClosureDescriptionExtension
 Id: pq-container-closure-description-extension 
-Title: "Container Closure"
-Description: "The a brief description of the components, the assembled packaging system and any precautions needed to ensure the protection and preservation of the drug substance and drug product during their use in the clinical trials"
-* . ^short = "Container Closure System Information"
-* ^context[+].type = #element
-* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct"
-
-* extension.value[x] only markdown
-* extension.valueMarkdown ^short = "Container Closure System Description"
-* extension.valueMarkdown ^definition = """Any textual comments that describe the sum of container closure system (CCS) components that together contain and protect the dosage form or drug substance. [Source: Adapted from Q1A(R2)-ICH Glossary]
+Title: "Container Closure System Description"
+Description: """Any textual comments that describe the sum of container closure system (CCS) components that together contain and protect the dosage form or drug substance. [Source: Adapted from Q1A(R2)-ICH Glossary]
 Example: White opaque, round 50 mL HDPE bottle with a fitted 33 mm child resistant black polypropylene threaded cap closure, aluminum sealed, and containing molecular sieve canister 2 gm (CAN TRISORB 2G) as desiccant.
 Note: This includes primary packaging components and secondary packaging components, if the latter are intended to provide additional protection to the drug substance or the drug product. A packaging system is equivalent to a container closure system. [Source: Adapted from Q1A(R2)-ICH Glossary]
 """
+* . ^short = "Container Closure System Information"
+* ^context[+].type = #element
+* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct.text"
+* extension.value[x] only markdown
+ 
 
 Extension: DepictionExtension
 Id:  pq-container-closure-depiction-extension 
@@ -21,8 +19,8 @@ Title: "Container Closure Depiction"
 Description: "The packaging diagrams reference from the description."
 * . ^short = "Container Closure Depiction"
 * ^context[+].type = #element
-* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct"
-* extension.value[x] only Reference(Base64DocumentReference)
+* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct.text"
+* extension.value[x] only Reference
 
 Profile: Base64DocumentReference
 Parent: DocumentReference
@@ -63,12 +61,6 @@ Note: This value should be unique across all specifications for a given material
 * status MS
 * subjectReference 1..1 MS
 * subjectReference only Reference( MedicinalProductDefinition or SubstanceDefinition )
-* date 1..1 MS
-* date ^short = "Specification Version Date"
-* date ^definition = """The date when the sponsor assigned a date to a specific version. [Source: SME Defined].coding
-Note: This is the date a particular version of the specification was internally accepted by the submitter.
-"""
-
 
 
 Profile: DrugProductContainerClosure
@@ -82,15 +74,31 @@ Description: "Description and coding of the container closure system. Profile of
 * packagedMedicinalProduct 1..1 MS
 * packagedMedicinalProduct.coding 2..2 MS
 * packagedMedicinalProduct.coding ^slicing.discriminator.type = #value
-* packagedMedicinalProduct.coding ^slicing.discriminator.path = "$this"
-* packagedMedicinalProduct.coding ^slicing.rules = #open // or #closed if you don't want other concepts
+* packagedMedicinalProduct.coding ^slicing.discriminator.path = "$this.code"
+* packagedMedicinalProduct.coding ^slicing.rules = #closed
 * packagedMedicinalProduct.coding contains
     container 1..1 and
     closure 1..1 
-* packagedMedicinalProduct.coding[container] ^short = "container"
+* packagedMedicinalProduct.coding[container] ^short = "Container"
 * packagedMedicinalProduct.coding[container] from PqcmcContainerTypeTerminology
-* packagedMedicinalProduct.coding[closure] ^short = "closure"
+* packagedMedicinalProduct.coding[closure] ^short = "Closure"
 * packagedMedicinalProduct.coding[closure] from PqcmcClosureTypeTerminology
 * packagedMedicinalProduct.text 1..1 MS
 * packagedMedicinalProduct.text.extension contains pq-container-closure-description-extension named container-closure-description 1..1 MS and pq-container-closure-depiction-extension named container-closure-depiction 0..* MS
+* name 1..2 MS
+* name.productName 1..1 MS
+* name.type 1..1 MS
+
+Profile: RoutineSubstanceDefinition
+Parent: SubstanceDefinition
+Id: pqcmc-routine-drug-substance
+Title: "Routine Drug Substance"
+Description: "Provides sufficient information to identify a drug substance. Profile on Drug Substance profile."
+
+* identifier 0..1 MS
+* identifier ^short = "optional user designated identifier"
+
+* name 1..* MS
+* name ^short = "Product Ingredient Name"
+* name ^definition = "Any ingredient intended for use in the manufacture of a drug product, including those that may not appear in such drug product. [Source: (21 CFR 210.3 (b) (3)) PAC-ATLS 1998]"
 
