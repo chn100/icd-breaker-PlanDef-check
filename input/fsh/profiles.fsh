@@ -26,3 +26,35 @@ Note: This value should be unique across all specifications for a given material
 * date ^definition = """The date when the sponsor assigned a date to a specific version. [Source: SME Defined]
 Note: This is the date a particular version of the specification was internally accepted by the submitter.
 """
+Alias: $UCUM = http://example.org
+Alias: $NCIT = http://example.org
+
+Profile: MIDProfile
+Parent: ManufacturedItemDefinition
+* identifier 0..1 MS
+* status 1..1 MS
+* manufacturedDoseForm.coding from SplPharmaceuticalDosageFormTerminology
+// The following three rules are needed in order to use the Numerator and Denominator
+// slices in the component.component.amount (and deeper) elements.
+* component ^type.profile = "http://example.org/StructureDefinition/MIDProfile"
+* component ^type.profile.extension.url = "http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element"
+* component ^type.profile.extension.valueString = "ManufacturedItemDefinition.component"
+* component.amount ^slicing.discriminator.type = #exists
+* component.amount ^slicing.discriminator.path = "amount"
+* component.amount ^slicing.description = "Slice based on the component.amounts."
+* component.amount ^slicing.rules = #closed
+* component.amount contains
+    Numerator 1..1 MS and
+    Denominator 1..1 MS
+* component.constituent.location 0..* MS
+* component.constituent.location.coding from PqcmcProductPartIngredientPhysicalLocationVS
+* component.constituent.function 0..2 MS
+* component.constituent.function ^slicing.discriminator.type = #exists
+* component.constituent.function ^slicing.discriminator.path = function
+* component.constituent.function ^slicing.rules = #closed
+* component.constituent.function ^slicing.description = "Slice based on the component.functions."
+* component.constituent.function contains
+    Category 0..1 MS and
+    Function 0..1 MS
+
+
