@@ -1,42 +1,14 @@
-Alias: $NCIT = http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl
+Profile: RoutineSubstanceDefinition
+Parent: SubstanceDefinition
+Id: pqcmc-routine-drug-substance
+Title: "Routine Drug Substance"
+Description: "Provides sufficient information to identify a drug substance. Profile on Drug Substance profile."
 
-Extension: ContainerClosureDescriptionExtension
-Id: pq-container-closure-description-extension 
-Title: "Container Closure System Description"
-Description: """Any textual comments that describe the sum of container closure system (CCS) components that together contain and protect the dosage form or drug substance. [Source: Adapted from Q1A(R2)-ICH Glossary]
-Example: White opaque, round 50 mL HDPE bottle with a fitted 33 mm child resistant black polypropylene threaded cap closure, aluminum sealed, and containing molecular sieve canister 2 gm (CAN TRISORB 2G) as desiccant.
-Note: This includes primary packaging components and secondary packaging components, if the latter are intended to provide additional protection to the drug substance or the drug product. A packaging system is equivalent to a container closure system. [Source: Adapted from Q1A(R2)-ICH Glossary]
-"""
-* . ^short = "Container Closure System Information"
-* ^context[+].type = #element
-* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct.text"
-* extension.value[x] only markdown
- 
-
-Extension: DepictionExtension
-Id:  pq-container-closure-depiction-extension 
-Title: "Container Closure Depiction"
-Description: "The packaging diagrams reference from the description."
-* . ^short = "Container Closure Depiction"
-* ^context[+].type = #element
-* ^context[=].expression = "MedicinalProductDefinition.packagedMedicinalProduct.text"
-* extension.value[x] only Reference
-
-Profile: Base64DocumentReference
-Parent: DocumentReference
-Id: cmc-document-reference
-Description: "A profile that represents the document or diagram in base64"
-* status from http://hl7.org/fhir/ValueSet/document-reference-status
-* status = #current (exactly)
-* content MS
-* content.attachment MS
-* content.attachment.contentType 1..1 MS
-* content.attachment.data 1..1 MS
-* content.attachment.title 1..1 MS 
-* content.attachment.title ^short = "Document file name including the file extension"
-* content.attachment.title ^definition = """A format or abbreviation name that identifies a file structure. [Source: SME Defined]
-Used for the following: Analytical Instrument Data File Type, Impurity Analysis Graphic, Impurity Analytical Instrument Data File, Impurity Chemical Structure Data File, and Substance Structure Graphic.
-"""
+* identifier 0..1 MS
+* identifier ^short = "optional user designated identifier"
+* name 1..* MS
+* name ^short = "Product Ingredient Name"
+* name ^definition = "Any ingredient intended for use in the manufacture of a drug product, including those that may not appear in such drug product. [Source: (21 CFR 210.3 (b) (3)) PAC-ATLS 1998]"
 
 Profile: QualitySpecification2
 Parent: PlanDefinition
@@ -62,43 +34,20 @@ Note: This value should be unique across all specifications for a given material
 * subjectReference 1..1 MS
 * subjectReference only Reference( MedicinalProductDefinition or SubstanceDefinition )
 
+Alias: $UCUM = http://example.org
+Alias: $NCIT = http://example2.org
 
-Profile: DrugProductContainerClosure
-Parent: MedicinalProductDefinition
-Id: pqcmc-drugproduct-container-closure
-Title: "Drug Product Container Closure"
-Description: "Description and coding of the container closure system. Profile of Drug Product profile."
-
-* identifier 0..1 
-* identifier ^short = "optional user designated identifier"	
-* packagedMedicinalProduct 1..1 MS
-* packagedMedicinalProduct.coding 2..2 MS
-* packagedMedicinalProduct.coding ^slicing.discriminator.type = #value
-* packagedMedicinalProduct.coding ^slicing.discriminator.path = "$this.code"
-* packagedMedicinalProduct.coding ^slicing.rules = #closed
-* packagedMedicinalProduct.coding contains
-    container 1..1 and
-    closure 1..1 
-* packagedMedicinalProduct.coding[container] ^short = "Container"
-* packagedMedicinalProduct.coding[container] from PqcmcContainerTypeTerminology
-* packagedMedicinalProduct.coding[closure] ^short = "Closure"
-* packagedMedicinalProduct.coding[closure] from PqcmcClosureTypeTerminology
-* packagedMedicinalProduct.text 1..1 MS
-* packagedMedicinalProduct.text.extension contains pq-container-closure-description-extension named container-closure-description 1..1 MS and pq-container-closure-depiction-extension named container-closure-depiction 0..* MS
-* name 1..2 MS
-* name.productName 1..1 MS
-* name.type 1..1 MS
-
-Profile: RoutineSubstanceDefinition
-Parent: SubstanceDefinition
-Id: pqcmc-routine-drug-substance
-Title: "Routine Drug Substance"
-Description: "Provides sufficient information to identify a drug substance. Profile on Drug Substance profile."
-
-* identifier 0..1 MS
-* identifier ^short = "optional user designated identifier"
-
-* name 1..* MS
-* name ^short = "Product Ingredient Name"
-* name ^definition = "Any ingredient intended for use in the manufacture of a drug product, including those that may not appear in such drug product. [Source: (21 CFR 210.3 (b) (3)) PAC-ATLS 1998]"
-
+Profile: MIDProfile
+Parent: ManufacturedItemDefinition
+// The following three rules are needed in order to use the Numerator and Denominator
+// slices in the component.component.amount (and deeper) elements.
+* component ^type.profile = "http://example.org/StructureDefinition/MIDProfile"
+* component ^type.profile.extension.url = "http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element"
+* component ^type.profile.extension.valueString = "ManufacturedItemDefinition.component"
+* component.amount ^slicing.discriminator.type = #exists
+* component.amount ^slicing.discriminator.path = "amount"
+* component.amount ^slicing.description = "Slice based on the component.amounts."
+* component.amount ^slicing.rules = #closed
+* component.amount contains
+    Numerator 1..1 MS and
+    Denominator 1..1 MS
