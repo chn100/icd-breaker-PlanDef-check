@@ -1,3 +1,6 @@
+Alias: $UCUM = http://example.org
+Alias: $NCIT = http://example2.org
+
 Profile: RoutineSubstanceDefinition
 Parent: SubstanceDefinition
 Id: pqcmc-routine-drug-substance
@@ -33,21 +36,3 @@ Note: This value should be unique across all specifications for a given material
 * status MS
 * subjectReference 1..1 MS
 * subjectReference only Reference( MedicinalProductDefinition or SubstanceDefinition )
-
-Alias: $UCUM = http://example.org
-Alias: $NCIT = http://example2.org
-
-Profile: MIDProfile
-Parent: ManufacturedItemDefinition
-// The following three rules are needed in order to use the Numerator and Denominator
-// slices in the component.component.amount (and deeper) elements.
-* component ^type.profile = "http://example.org/StructureDefinition/MIDProfile"
-* component ^type.profile.extension.url = "http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element"
-* component ^type.profile.extension.valueString = "ManufacturedItemDefinition.component"
-* component.amount ^slicing.discriminator.type = #exists
-* component.amount ^slicing.discriminator.path = "amount"
-* component.amount ^slicing.description = "Slice based on the component.amounts."
-* component.amount ^slicing.rules = #closed
-* component.amount contains
-    Numerator 1..1 MS and
-    Denominator 1..1 MS
